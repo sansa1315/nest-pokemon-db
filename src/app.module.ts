@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MongooseModule } from '@nestjs/mongoose';
-import { PokemonController } from './pokemon/pokemon.controller';
-import { PokemonService } from './pokemon/pokemon.service';
 import { PokemonModule } from './pokemon/pokemon.module';
+import { CommonModule } from './common/common.module';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -12,10 +12,9 @@ import { PokemonModule } from './pokemon/pokemon.module';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
-    PokemonModule
+    PokemonModule,
+    CommonModule,
+    SeedModule
   ],
-  controllers: [PokemonController],
-  providers: [PokemonService],
-  
 })
 export class AppModule {}
