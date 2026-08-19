@@ -1,15 +1,22 @@
 import { Get, Injectable, InternalServerErrorException } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
 import { PokemonResponseInterface } from './interfaces/pokemon-response.interface';
+import { PokemonService } from 'src/pokemon/pokemon.service';
+import { AxiosAdapter } from 'src/common/adapters/axios-adapter';
 
 
 @Injectable()
-export class SeedService {
-  private readonly axios: AxiosInstance = axios;
+export class SeedService {  
+
+  constructor(
+    private readonly pokemonService: PokemonService,
+    private readonly http: AxiosAdapter
+) {}
   
   async create() {
     try {
-        const { data } = await this.axios.get<PokemonResponseInterface>(
+        
+        const data = await this.http.get<PokemonResponseInterface>(
             'https://pokeapi.co/api/v2/pokemon?limit=650'
         );
 
@@ -20,6 +27,12 @@ export class SeedService {
                 no: +number!,
             };
         });
+
+        // for (const pokemon of seedData) {
+        //     await this.pokemonService.createPokemon(pokemon);
+        // }
+
+        await this.pokemonService.fillWithSeed(seedData);
 
         return seedData;
 

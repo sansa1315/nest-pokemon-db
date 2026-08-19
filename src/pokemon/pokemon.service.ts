@@ -4,13 +4,21 @@ import { Model } from 'mongoose';
 import { Pokemon } from './entities/pokemon.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { UpdatePokemonDto } from './dto/update-pokemon.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PokemonService {
+    private defaultLimit: number
+    private defaultOffset: number
     constructor(
         @InjectModel(Pokemon.name)
-        private readonly pokemonModel: Model<Pokemon>
-    ) {}
+        private readonly pokemonModel: Model<Pokemon>,
+        private readonly configService: ConfigService
+    ) {
+        this.defaultLimit = this.configService.get<number>('DEFAULT_LIMIT')!;
+        this.defaultOffset = this.configService.get<number>('DEFAULT_OFFSET')!;
+    }
     async createPokemon(createPokemonDto: CreatePokemonDto) {
         try {
             const pokemon = await this.pokemonModel.create(createPokemonDto);
@@ -59,7 +67,17 @@ export class PokemonService {
         // return `Pokemon ${pokemon.name} deleted successfully`;
     }
 
-    async findAll() {
-        return this.pokemonModel.find();
+    async findAll( paginationDto : PaginationDto ) {
+        const { limit = this.defaultLimit || 10, offset = this.defaultOffset || 0 } = paginationDto;
+        return this.pokemonModel.find()
+            .limit(limit)
+            .skip(offset)
+            .sort({ no: 1 })
+            .select('-__v');
+    }
+
+    async fillWithSeed(seed) {        
+        await this.pokemonModel.deleteMany({}); //borramos todos
+        await this.pokemonModel.insertMany(seed);
     }
 }
