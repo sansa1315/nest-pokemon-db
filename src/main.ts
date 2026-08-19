@@ -1,12 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import dns from 'node:dns';
+// import dns from 'node:dns';
 
-dns.setServers([
-  '8.8.8.8',
-  '8.8.4.4',
-]);
+// dns.setServers([
+//   '8.8.8.8',
+//   '8.8.4.4',
+// ]);
 
 async function main() {
   const app = await NestFactory.create(AppModule);
